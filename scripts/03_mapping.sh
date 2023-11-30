@@ -54,7 +54,7 @@ for x in ${DESTINATION}/mapped_bamfiles/*.bam; do samtools sort -@ 4 ${x} -o $(b
 # Remove the unsorted BAM file
 rm *GRCh38_p14.bam
 
-# Mapping filtered reads to transcriptome 
+# Mapping filtered reads to transcriptome (for codon occupancy)
 # --------------------
 cd ${DESTINATION}/
 

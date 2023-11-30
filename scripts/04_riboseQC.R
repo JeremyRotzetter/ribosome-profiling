@@ -1,5 +1,11 @@
+################################################################################
+######################### Ribo-seQC ############################################
+################################################################################
+
 # Ribo-seQC is a package that performs quality control analysis of small RNA-seq
 # data (in .bam format), with a focus on Ribo-seq and related techniques.
+
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # will set working directory to the script file path in Rstudio
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
@@ -9,9 +15,9 @@ setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 # dependencies.
 
 # install.packages("devtools")
-# 
+#
 # library("devtools")
-# 
+#
 # install_github(repo = "ohlerlab/RiboseQC")
 
 ###### Debugging part ######
@@ -46,37 +52,49 @@ setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 
 ###### Analysis part ######
 
+
 # Load the package
 library(RiboseQC)
 
+
 # Prepare genome file (to be done only once!!!)
-prepare_annotation_files(annotation_directory = "./",
-                         twobit_file = "GRCh38.p14.genome.2bit",
-                         gtf_file = "Homo_sapiens.GRCh38.108.gtf",
-                         scientific_name = "Homo.sapiens",
-                         annotation_name = "GRCh38",
-                         export_bed_tables_TxDb = F,
-                         forge_BSgenome = T,
-                         create_TxDb = T)
+prepare_annotation_files(
+  annotation_directory = "./",
+  twobit_file = "GRCh38.p14.genome.2bit",
+  gtf_file = "Homo_sapiens.GRCh38.108.gtf",
+  scientific_name = "Homo.sapiens",
+  annotation_name = "GRCh38",
+  export_bed_tables_TxDb = F,
+  forge_BSgenome = T,
+  create_TxDb = T
+)
 
 
 # Genome mapped sorted-BAM files
 
-genome_bam <- c("RPF_KO_Rep1_clpd_tr_no_r-t-sno-sn-RNA_GRCh38_p14_sorted.bam",
-                "RPF_KO_Rep2_clpd_tr_no_r-t-sno-sn-RNA_GRCh38_p14_sorted.bam",
-                "RPF_WT_Rep1_clpd_tr_no_r-t-sno-sn-RNA_GRCh38_p14_sorted.bam",
-                "RPF_WT_Rep2_clpd_tr_no_r-t-sno-sn-RNA_GRCh38_p14_sorted.bam")
+genome_bam <- c(
+  "RPF_KO_Rep1_clpd_tr_no_r-t-sno-sn-RNA_GRCh38_p14_sorted.bam",
+  "RPF_KO_Rep2_clpd_tr_no_r-t-sno-sn-RNA_GRCh38_p14_sorted.bam",
+  "RPF_WT_Rep1_clpd_tr_no_r-t-sno-sn-RNA_GRCh38_p14_sorted.bam",
+  "RPF_WT_Rep2_clpd_tr_no_r-t-sno-sn-RNA_GRCh38_p14_sorted.bam"
+)
 
 load_annotation("Homo_sapiens.GRCh38.108.gtf_Rannot")
 
 ###### QC plots ######
 
-RiboseQC_analysis(annotation_file ="Homo_sapiens.GRCh38.108.gtf_Rannot",
-                  bam_files = genome_bam,
-                  fast_mode = T,
-                  report_file = "RPF_samples_QC.html",
-                  sample_names = c("WT_Rep1", "WT_Rep2",
-                                   "KO_Rep1", "KO_Rep2"),
-                  dest_names = c("WT_Rep1", "WT_Rep2",
-                                 "KO_Rep1", "KO_Rep2"),
-                  write_tmp_files = F)
+RiboseQC_analysis(
+  annotation_file = "Homo_sapiens.GRCh38.108.gtf_Rannot",
+  bam_files = genome_bam,
+  fast_mode = T,
+  report_file = "RPF_samples_QC.html",
+  sample_names = c(
+    "WT_Rep1", "WT_Rep2",
+    "KO_Rep1", "KO_Rep2"
+  ),
+  dest_names = c(
+    "WT_Rep1", "WT_Rep2",
+    "KO_Rep1", "KO_Rep2"
+  ),
+  write_tmp_files = F
+)
