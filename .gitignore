@@ -4,5 +4,6 @@ annotation/
 data_processing/
 mapping/
 DE_analysis/
+codon_occupancy/
 .Rproj.user
 .Rhistory
