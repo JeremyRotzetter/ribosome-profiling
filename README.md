@@ -37,8 +37,8 @@ Since the 'make' utility is not installed on your system, there are different wa
 
 - [renv](renv) folder: contains renv and the files needed to initialize the project library.
 - [scripts](scripts) folder: contains the scripts used in the analysis of the data. The logical order in which they should be executed is given by their numbering, with support scripts being unnumbered.
-    >[!TIP]
-    > All bash scripts were written with SBATCH options so that the script could be submitted to the SLURM workload manager to reduce the computational load at the head node of the IBU cluster (or any other HPC).
+>[!TIP]
+> All bash scripts were written with SBATCH options so that the script could be submitted to the SLURM workload manager to reduce the computational load at the head node of the IBU cluster (or any other HPC).
 - [renv.lock](renv.lock) file: this file lists all dependencies used in the project, i.e. the R version, all packages, their version and their source (CRAN, Bioconductor, GitHub). renv uses this file to restore the library.
 - [ribosome-profiling.Rproj](ribosome-profiling.Rproj) file: the project can be opened with this .Rproj file in RStudio, and the working directory is automatically set to the project directory where the .Rproj file is located. As a consequence, any path found within the scripts is relative to this project working directory.
 
