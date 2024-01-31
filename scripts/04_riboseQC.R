@@ -1,63 +1,65 @@
-################################################################################
 ######################### Ribo-seQC ############################################
-################################################################################
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Ribo-seQC is a package that performs quality control analysis of small RNA-seq
 # data (in .bam format), with a focus on Ribo-seq and related techniques.
 
-## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# will set working directory to the script file path in Rstudio
-setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+# Open explorer window to select the working directory (assumes script is run
+# in Rstudio, requires graphical interactive desktop environment)
+setwd(rstudioapi::selectDirectory())
 
-# Installation of the package (to be done only once!)
-# Despite having bugs that need fixing, should be done to install the
-# dependencies.
+# setwd("/some/path/")
 
-# install.packages("devtools")
-#
-# library("devtools")
-#
-# install_github(repo = "ohlerlab/RiboseQC")
+## Installation of the package (to be done only once!)
+## Despite having bugs that need fixing, should be done to install the
+## dependencies.
+
+## install.packages("devtools")
+
+## library("devtools")
+##
+## install_github(repo = "ohlerlab/RiboseQC")
 
 ###### Debugging part ######
 
-# 1. Download the fork of RiboseQC either by git clone or direct download of zip
-# file from here: https://github.com/Tim-Yu/RiboseQC/tree/master
+## 1. Download the fork of RiboseQC either by git clone or direct download of zip
+## file from here: https://github.com/Tim-Yu/RiboseQC/tree/master
 
-# 2. Open RiboseQC/R/riboseqc.R in RStudio (or any other IDE)
+## 2. Open RiboseQC/R/riboseqc.R in RStudio (or any other IDE)
 
-# 3. Comment out line 2283 i.e. it should look like
-# # genome_sequence<-get(library(GTF_annotation$genome,character.only = TRUE))
-# i.e. put a # at the starting of this line.
+## 3. Comment out line 2283 i.e. it should look like
+## genome_sequence<-get(library(GTF_annotation$genome,character.only = TRUE))
+## i.e. put a # at the starting of this line.
 
-# 4. Edit line 2694 from n_transcripts = length(unique(gtfdata$transcript_id)) to
-# n_transcripts = length(unique(na.omit(gtfdata$transcript_id)))
+## 4. Edit line 2694 from n_transcripts = length(unique(gtfdata$transcript_id)) to
+## n_transcripts = length(unique(na.omit(gtfdata$transcript_id)))
 
-# 5. Save your changes
+## 5. Save your changes
 
-# 6. Press Cmd/Ctrl + Shift + 0 or Session > Restart R
+## 6. Press Cmd/Ctrl + Shift + 0 or Session > Restart R
 
-# 7. Type remove.packages("RiboseQC") to remove your current installation of
-# RiboseQC that has the bug.
+## 7. Type remove.packages("RiboseQC") to remove your current installation of
+## RiboseQC that has the bug.
 
-# 8. In the terminal, navigate to the directory which contains correct RiboseQC code
+## 8. In the terminal, navigate to the directory which contains correct RiboseQC code
 
-# 9. Issue the command (in terminal) R CMD build RiboseQC/ which should make
-# RiboseQC_0.99.0.tar.gz
+## 9. Issue the command (in terminal) R CMD build RiboseQC/ which should make
+## RiboseQC_0.99.0.tar.gz
 
-# 10. Open RStudio and install.packages("/path/to/RiboseQC_0.99.0.tar.gz", repos = NULL, type="source")
+## 10. Open RStudio and install.packages("/path/to/RiboseQC_0.99.0.tar.gz", repos = NULL, type="source")
 
-# 11. Try to do the QC analysis again.
+## 11. Try to do the QC analysis again.
 
 ###### Analysis part ######
 
 
-# Load the package
+## Load the package
 library(RiboseQC)
 
 
-# Prepare genome file (to be done only once!!!)
+## Prepare genome file (to be done only once!!!)
 prepare_annotation_files(
   annotation_directory = "./",
   twobit_file = "GRCh38.p14.genome.2bit",
@@ -70,7 +72,7 @@ prepare_annotation_files(
 )
 
 
-# Genome mapped sorted-BAM files
+## Genome mapped sorted-BAM files
 
 genome_bam <- c(
   "RPF_KO_Rep1_clpd_tr_no_r-t-sno-sn-RNA_GRCh38_p14_sorted.bam",

@@ -1,6 +1,5 @@
-################################################################################
 ######################### Gene Ontology Analysis ###############################
-################################################################################
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## This script is designed to take DESeq2 result file as input.
 ## This file was generated in the previous step (05_03_diff_gene_expr_analysis.R)
@@ -13,8 +12,9 @@
 
 # Open explorer window to select the working directory (assumes script is run
 # in Rstudio, requires graphical interactive desktop environment)
-setwd(rstudioapi::selectDirectory())
+# setwd(rstudioapi::selectDirectory())
 
+# setwd("/some/path/")
 
 library(grid)
 library(gridExtra)
@@ -30,7 +30,7 @@ sample_name <- "RPF_KO_vs_WT"
 
 ## Load DESeq2 output file.
 
-df <- read.csv("RPF_KO_vs_WT_DESeq2_res.csv", sep = ",", header = T)
+df <- read.csv("./DE_analysis/RPF_KO_vs_WT_DESeq2_res.csv", sep = ",", header = T)
 
 ## Set rownames as GeneID column
 
@@ -88,7 +88,7 @@ GOdata_down_bp <- topgo_object("BP", genelist_down)
 GOdata_down_mf <- topgo_object("MF", genelist_down)
 GOdata_down_cc <- topgo_object("CC", genelist_down)
 
-# Fischer exact test
+## Fischer exact test
 
 resultFis_up_bp <- runTest(GOdata_up_bp, algorithm = "elim", statistic = "fisher")
 resultFis_up_mf <- runTest(GOdata_up_mf, algorithm = "elim", statistic = "fisher")
@@ -170,8 +170,8 @@ plot_down_BP <- plot_GO(GOres_down_bp, "Biological Proccess", "TopGO Down (fishe
 plot_down_MF <- plot_GO(GOres_down_mf, "Molecular Function", "TopGO Down (fisher's exact test)", "#73D055FF")
 plot_down_CC <- plot_GO(GOres_down_cc, "Cellular Component", "TopGO Down (fisher's exact test)", "#73D055FF")
 
-# Prepare data for writing
-# retrieve genes2GO list from the "expanded" annotation in GOdata
+## Prepare data for writing
+## retrieve genes2GO list from the "expanded" annotation in GOdata
 
 extract_genes <- function(GOdata, regulation_level) {
   #' Extract our genes in all identified GO terms
@@ -204,33 +204,39 @@ GO_df_down_cc <- extract_genes(GOdata_down_cc, genes_down)
 
 ## Export plots as PDF
 
-pdf(paste(sample_name, "_Biological_Proccess_TopGO_Up_fisher.pdf", sep = ""))
+# Check if the folder exists
+if (!dir.exists("./gene_ontology")) {
+  # Create the folder
+  dir.create("./gene_ontology")
+}
+
+pdf(paste("./gene_ontology/", sample_name, "_Biological_Proccess_TopGO_Up_fisher.pdf", sep = ""))
 plot_up_BP
 dev.off()
 
-pdf(paste(sample_name, "_Molecular_Function_TopGO_Up_fisher.pdf", sep = ""))
+pdf(paste("./gene_ontology/", sample_name, "_Molecular_Function_TopGO_Up_fisher.pdf", sep = ""))
 plot_up_MF
 dev.off()
 
-pdf(paste(sample_name, "_Cellular_Component_TopGO_Up_fisher.pdf", sep = ""))
+pdf(paste("./gene_ontology/", sample_name, "_Cellular_Component_TopGO_Up_fisher.pdf", sep = ""))
 plot_up_CC
 dev.off()
 
-pdf(paste(sample_name, "_Biological_Proccess_TopGO_down_fisher.pdf", sep = ""))
+pdf(paste("./gene_ontology/", sample_name, "_Biological_Proccess_TopGO_down_fisher.pdf", sep = ""))
 plot_down_BP
 dev.off()
 
-pdf(paste(sample_name, "_Molecular_Function_TopGO_down_fisher.pdf", sep = ""))
+pdf(paste("./gene_ontology/", sample_name, "_Molecular_Function_TopGO_down_fisher.pdf", sep = ""))
 plot_down_MF
 dev.off()
 
-pdf(paste(sample_name, "_Cellular_Component_TopGO_down_fisher.pdf", sep = ""))
+pdf(paste("./gene_ontology/", sample_name, "_Cellular_Component_TopGO_down_fisher.pdf", sep = ""))
 plot_down_CC
 dev.off()
 
-# Tables
+## Tables
 write.table(GO_df_up_bp,
-  file = paste(sample_name, "_BP_Up_fisher_Genes_in_GO.txt", sep = ""),
+  file = paste("./gene_ontology/", sample_name, "_BP_Up_fisher_Genes_in_GO.txt", sep = ""),
   sep = "\t",
   row.names = F,
   col.names = T,
@@ -239,7 +245,7 @@ write.table(GO_df_up_bp,
 )
 
 write.table(GO_df_up_mf,
-  file = paste(sample_name, "_MF_Up_fisher_Genes_in_GO.txt", sep = ""),
+  file = paste("./gene_ontology/", sample_name, "_MF_Up_fisher_Genes_in_GO.txt", sep = ""),
   sep = "\t",
   row.names = F,
   col.names = T,
@@ -248,7 +254,7 @@ write.table(GO_df_up_mf,
 )
 
 write.table(GO_df_up_cc,
-  file = paste(sample_name, "_CC_Up_fisher_Genes_in_GO.txt", sep = ""),
+  file = paste("./gene_ontology/", sample_name, "_CC_Up_fisher_Genes_in_GO.txt", sep = ""),
   sep = "\t",
   row.names = F,
   col.names = T,
@@ -257,7 +263,7 @@ write.table(GO_df_up_cc,
 )
 
 write.table(GO_df_down_bp,
-  file = paste(sample_name, "_BP_Down_fisher_Genes_in_GO.txt", sep = ""),
+  file = paste("./gene_ontology/", sample_name, "_BP_Down_fisher_Genes_in_GO.txt", sep = ""),
   sep = "\t",
   row.names = F,
   col.names = T,
@@ -266,7 +272,7 @@ write.table(GO_df_down_bp,
 )
 
 write.table(GO_df_down_mf,
-  file = paste(sample_name, "_MF_Down_fisher_Genes_in_GO.txt", sep = ""),
+  file = paste("./gene_ontology/", sample_name, "_MF_Down_fisher_Genes_in_GO.txt", sep = ""),
   sep = "\t",
   row.names = F,
   col.names = T,
@@ -275,7 +281,7 @@ write.table(GO_df_down_mf,
 )
 
 write.table(GO_df_down_cc,
-  file = paste(sample_name, "_CC_Down_fisher_Genes_in_GO.txt", sep = ""),
+  file = paste("./gene_ontology/", sample_name, "_CC_Down_fisher_Genes_in_GO.txt", sep = ""),
   sep = "\t",
   row.names = F,
   col.names = T,
@@ -286,7 +292,7 @@ write.table(GO_df_down_cc,
 ## GO data
 
 write.table(GOres_up_bp,
-  file = paste(sample_name, "_BP_Up_fisher_GO_terms.txt", sep = ""),
+  file = paste("./gene_ontology/", sample_name, "_BP_Up_fisher_GO_terms.txt", sep = ""),
   sep = "\t",
   row.names = F,
   col.names = T,
@@ -295,7 +301,7 @@ write.table(GOres_up_bp,
 )
 
 write.table(GOres_up_mf,
-  file = paste(sample_name, "_MF_Up_fisher_GO_terms.txt", sep = ""),
+  file = paste("./gene_ontology/", sample_name, "_MF_Up_fisher_GO_terms.txt", sep = ""),
   sep = "\t",
   row.names = F,
   col.names = T,
@@ -304,7 +310,7 @@ write.table(GOres_up_mf,
 )
 
 write.table(GOres_up_cc,
-  file = paste(sample_name, "_CC_Up_fisher_GO_terms.txt", sep = ""),
+  file = paste("./gene_ontology/", sample_name, "_CC_Up_fisher_GO_terms.txt", sep = ""),
   sep = "\t",
   row.names = F,
   col.names = T,
@@ -313,7 +319,7 @@ write.table(GOres_up_cc,
 )
 
 write.table(GOres_down_bp,
-  file = paste(sample_name, "_BP_Down_fisher_GO_terms.txt", sep = ""),
+  file = paste("./gene_ontology/", sample_name, "_BP_Down_fisher_GO_terms.txt", sep = ""),
   sep = "\t",
   row.names = F,
   col.names = T,
@@ -322,7 +328,7 @@ write.table(GOres_down_bp,
 )
 
 write.table(GOres_down_mf,
-  file = paste(sample_name, "_MF_Down_fisher_GO_terms.txt", sep = ""),
+  file = paste("./gene_ontology/", sample_name, "_MF_Down_fisher_GO_terms.txt", sep = ""),
   sep = "\t",
   row.names = F,
   col.names = T,
@@ -331,7 +337,7 @@ write.table(GOres_down_mf,
 )
 
 write.table(GOres_down_cc,
-  file = paste(sample_name, "_CC_Down_fisher_GO_terms.txt", sep = ""),
+  file = paste("./gene_ontology/", sample_name, "_CC_Down_fisher_GO_terms.txt", sep = ""),
   sep = "\t",
   row.names = F,
   col.names = T,

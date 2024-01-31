@@ -1,29 +1,28 @@
-################################################################################
 ######################### Differential expression analysis #####################
-################################################################################
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# This script will perform the differential gene expression analysis using
-# DESeq2. It will:
-# 1. Start with count matrix input to prepare the input
-# (using CDS_counts_processed.txt obtained in previous step with
-# 05_01_featureCounts.sh).
-# 2. Perform pre-filtering.
-# 3. Run the DESeq function and save its output to a variable.
-# 4. Perform count data (log) transformation to remove the dependence of the
-# variance on the mean.
-# 5. Cluster samples based on their gene expression profiles.
+## This script will perform the differential gene expression analysis using
+## DESeq2. It will:
+## 1. Start with count matrix input to prepare the input
+## (using CDS_counts_processed.txt obtained in previous step with
+## 05_01_featureCounts.sh).
+## 2. Perform pre-filtering.
+## 3. Run the DESeq function and save its output to a variable.
+## 4. Perform count data (log) transformation to remove the dependence of the
+## variance on the mean.
+## 5. Cluster samples based on their gene expression profiles.
 
-## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Open explorer window to select the working directory (assumes script is run
-# in Rstudio, requires graphical interactive desktop environment)
-setwd(rstudioapi::selectDirectory())
-
+## Open explorer window to select the working directory (assumes script is run
+## in Rstudio, requires graphical interactive desktop environment)
+# setwd(rstudioapi::selectDirectory())
+# setwd("./DE_analysis/")
 
 # if (!require("BiocManager", quietly = TRUE))
 #   install.packages("BiocManager")
 # BiocManager::install(version = "3.18") # to upgrade to the at the time of
-# writing most recent version
+## writing most recent version
 
 # BiocManager::install(c("org.Hs.eg.db", "pathview", "clusterProfiler", "topGO"))
 
@@ -36,10 +35,10 @@ library(pheatmap)
 library(BiocParallel)
 library(org.Hs.eg.db) # Human AnnotationDbi
 # register(MulticoreParam(8)) # Change this based on your computer core count
-# NOTE: MulticoreParam() not supported on Windows
+## NOTE: MulticoreParam() not supported on Windows
 
 
-# Setting up color profiles from colorbrewer
+## Setting up color profiles from colorbrewer
 qual_col_pals <- brewer.pal.info[brewer.pal.info$category == "qual", ]
 mycols <- unlist(mapply(brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals)))
 
@@ -82,27 +81,27 @@ samples_df$condition <- factor(rep(c(
   rep(sample_2, no_of_reps)
 )))
 
-featurecount_data <- read.table("CDS_counts_processed.txt", header = TRUE, row.names = 1)
+featurecount_data <- read.table("./DE_analysis/counts_table/CDS_counts_processed.txt", header = TRUE, row.names = 1)
 
-# Reorder to make the order consistent with samples$run
+## Reorder to make the order consistent with samples$run
 featurecount_data <- featurecount_data[, c(3, 4, 1, 2)]
 
-# Change colnames
+## Change colnames
 colnames(featurecount_data) <- rownames(samples_df)
 
-# Import as DESeqDataSet (dds)
+## Import as DESeqDataSet (dds)
 dds <- DESeqDataSetFromMatrix(
   countData = featurecount_data,
   colData = samples_df,
   design = ~condition
 )
 
-# Pre-filtering
+## Pre-filtering
 keep <- rowSums(counts(dds)) >= 10
 dds <- dds[keep, ]
 
-# Factor levels
-# WT columns should be first followed by KO/treatment
+## Factor levels
+## WT columns should be first followed by KO/treatment
 dds$condition <- factor(
   c(
     rep(sample_1, no_of_reps),
@@ -114,24 +113,22 @@ dds$condition <- factor(
   )
 )
 
-# Differential expression analysis
+## Differential expression analysis
 dds <- DESeq(dds)
 
 
 # colData(dds) # to check whether names are correct
 
-################################################################################
-################################################################################
-# QC
-################################################################################
-################################################################################
 
-# Log transformation for data quality assessment
+# QC ###########################################################################
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+## Log transformation for data quality assessment
 rld <- rlog(dds, blind = FALSE)
 
-# Sample distance matrix
+## Sample distance matrix
 sampleDists <- as.matrix(dist(t(assay(rld))))
-pdf(paste(project_name, "QC_sample_distance_matrix_CDS.pdf", sep = "_"))
+pdf(paste("./DE_analysis/", project_name, "QC_sample_distance_matrix_CDS.pdf", sep = "_"))
 heatmap.2(as.matrix(sampleDists),
   key = T,
   trace = "none",
@@ -142,11 +139,11 @@ heatmap.2(as.matrix(sampleDists),
 )
 dev.off()
 
-# Count matrix heatmap
+## Count matrix heatmap
 select <- order(rowMeans(counts(dds, normalized = TRUE)))
 df <- as.data.frame(colData(dds)[, c("condition", "rep")])
 
-pdf(paste(project_name, "QC_count_matrix_CDS.pdf", sep = "_"))
+pdf(paste("./DE_analysis/", project_name, "QC_count_matrix_CDS.pdf", sep = "_"))
 pheatmap(assay(rld)[select, ],
   cluster_rows = FALSE,
   show_rownames = FALSE,
@@ -156,9 +153,9 @@ pheatmap(assay(rld)[select, ],
 dev.off()
 
 
-# PCA plot
+## PCA plot
 
-pdf(paste(project_name, "QC_PCA_CDS.pdf", sep = "_"))
+pdf(paste("./DE_analysis/", project_name, "QC_PCA_CDS.pdf", sep = "_"))
 pcaData <- plotPCA(rld, intgroup = c("condition", "rep"), returnData = TRUE)
 percentVar <- round(100 * attr(pcaData, "percentVar"))
 ggplot(
@@ -175,21 +172,19 @@ ggplot(
   coord_fixed()
 dev.off()
 
-################################################################################
-################################################################################
-## Resume the analysis
-################################################################################
-################################################################################
+
+## Resume the analysis #########################################################
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 res_2_vs_1 <- results(dds, contrast = c("condition", sample_2, sample_1), alpha = 0.05)
 
-# Adding gene names using org.Hs.eg.db
-# Source: http://bioconductor.org/help/course-materials/2015/LearnBioconductorFeb2015/B02.1.1_RNASeqLab.html
-# Also: https://support.bioconductor.org/p/66288/
-# This function takes a list of IDs as first argument and their key type as the second argument.
-# The third argument is the key type we want to convert to, the fourth is the AnnotationDb object to use.
-# Finally, the last argument specifies what to do if one source ID maps to several target IDs:
-# should the function return an NA or simply the first of the multiple IDs
+## Adding gene names using org.Hs.eg.db
+## Source: http://bioconductor.org/help/course-materials/2015/LearnBioconductorFeb2015/B02.1.1_RNASeqLab.html
+## Also: https://support.bioconductor.org/p/66288/
+## This function takes a list of IDs as first argument and their key type as the second argument.
+## The third argument is the key type we want to convert to, the fourth is the AnnotationDb object to use.
+## Finally, the last argument specifies what to do if one source ID maps to several target IDs:
+## should the function return an NA or simply the first of the multiple IDs
 
 convertIDs <- function(ids, from, to, db, ifMultiple = c("putNA", "useFirst")) {
   stopifnot(inherits(db, "AnnotationDb"))
@@ -205,10 +200,10 @@ convertIDs <- function(ids, from, to, db, ifMultiple = c("putNA", "useFirst")) {
   return(selRes[match(ids, selRes[, 1]), 2])
 }
 
-# # Check columns in the database:
+## Check columns in the database:
 columns(org.Hs.eg.db)
 
-# Actual adding of the column
+## Actual adding of the column
 
 res_2_vs_1$GeneID <- row.names(res_2_vs_1)
 res_2_vs_1$gene_symbol <- convertIDs(row.names(res_2_vs_1), "ENSEMBL", "SYMBOL", org.Hs.eg.db)
@@ -231,7 +226,7 @@ res_2_vs_1_df$regulation_level <- ifelse((res_2_vs_1_df$log2FoldChange > 0.5 & r
 )
 
 write.table(res_2_vs_1_df,
-  file = paste(project_name, "DESeq2_res.csv", sep = "_"),
+  file = paste("./DE_analysis/", project_name, "DESeq2_res.csv", sep = "_"),
   sep = ",",
   row.names = F,
   col.names = T,
@@ -243,7 +238,7 @@ res_2_vs_1_df$regulation_level <- factor(res_2_vs_1_df$regulation_level, levels 
 ## Remove rows with NA in padj column before plotting
 res_2_vs_1_df <- res_2_vs_1_df[!is.na(res_2_vs_1_df$padj), ]
 
-pdf(paste(project_name, "Volcano_plot1.pdf", sep = "_"), width = 4, height = 5)
+pdf(paste("./DE_analysis/", project_name, "Volcano_plot1.pdf", sep = "_"), width = 4, height = 5)
 ggplot(
   res_2_vs_1_df,
   aes(
@@ -261,7 +256,7 @@ ggplot(
 dev.off()
 
 
-pdf(paste(project_name, "Volcano_plot2.pdf", sep = "_", paper = "a4"), width = 8, height = 4)
+pdf(paste("./DE_analysis/", project_name, "Volcano_plot2.pdf", sep = "_", paper = "a4"), width = 8, height = 4)
 ggplot(
   res_2_vs_1_df,
   aes(

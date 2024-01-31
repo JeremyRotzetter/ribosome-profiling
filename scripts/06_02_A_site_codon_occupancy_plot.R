@@ -1,36 +1,35 @@
-################################################################################
 ######################### A-site codon occupancy plot ##########################
-################################################################################
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # This script will combine the data obtained with
 # 06_01_Codon_occupancy_generation.sh and generate the A-site occupancy plot.
 
-## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Open explorer window to select the working directory (assumes script is run
-# in Rstudio, requires graphical interactive desktop environment)
-setwd(rstudioapi::selectDirectory())
+## Open explorer window to select the working directory (assumes script is run
+## in Rstudio, requires graphical interactive desktop environment)
+## setwd(rstudioapi::selectDirectory())
 
-# Alternatively:
+## Alternatively:
 # setwd("/some/path/")
 
 ## Load package
 library(tidyverse)
 
 ## Datasets
-df_1 <- read.table("RPF_WT_Rep1_Codon_occupancy.txt",
+df_1 <- read.table("./codon_occupancy/RPF_WT_Rep1_Codon_occupancy.txt",
                    header = F,
                    sep = "\t")
 
-df_2 <- read.table("RPF_WT_Rep2_Codon_occupancy.txt",
+df_2 <- read.table("./codon_occupancy/RPF_WT_Rep2_Codon_occupancy.txt",
                    header = F,
                    sep = "\t")
 
-df_3 <- read.table("RPF_KO_Rep1_Codon_occupancy.txt",
+df_3 <- read.table("./codon_occupancy/RPF_KO_Rep1_Codon_occupancy.txt",
                    header = F,
                    sep = "\t")
 
-df_4 <- read.table("RPF_KO_Rep2_Codon_occupancy.txt",
+df_4 <- read.table("./codon_occupancy/RPF_KO_Rep2_Codon_occupancy.txt",
                    header = F,
                    sep = "\t")
 
@@ -70,7 +69,7 @@ data_plot$Norm_Occupancy_KO <- data_plot$KO / data_plot$WT
 data_plot <- data_plot[ , c(1, 4)]
 
 ## Plot
-pdf("A_site_codon_occupancy.pdf",width = 8, height = 10)
+pdf("./codon_occupancy/A_site_codon_occupancy.pdf",width = 8, height = 10)
 ggplot(data_plot,
        aes(x = Norm_Occupancy_KO,
            y = Codon)) +

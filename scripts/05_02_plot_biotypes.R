@@ -1,30 +1,29 @@
-################################################################################
 ######################### Plot Biotypes ########################################
-################################################################################
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# This script will create a proportional barchart from the output of the
-# previous script 05_01_featureCounts.sh to visualize which biotypes (miRNA,
-# lncRNA, protein-coding etc.) the reads are coming from.
+## This script will create a proportional barchart from the output of the
+## previous script 05_01_featureCounts.sh to visualize which biotypes (miRNA,
+## lncRNA, protein-coding etc.) the reads are coming from.
 
-## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# Open explorer window to select the working directory (assumes script is run
-# in Rstudio, requires graphical interactive desktop environment)
-setwd(rstudioapi::selectDirectory())
-
+## Open explorer window to select the working directory (assumes script is run
+## in Rstudio, requires graphical interactive desktop environment)
+# setwd(rstudioapi::selectDirectory())
+# setwd("./DE_analysis/")
 
 library(ggplot2)
 library(RColorBrewer)
 library(dplyr)
 
 
-# # From https://stackoverflow.com/questions/15282580/how-to-generate-a-number-of-most-distinctive-colors-in-r
+## From https://stackoverflow.com/questions/15282580/how-to-generate-a-number-of-most-distinctive-colors-in-r
 qual_col_pals <- brewer.pal.info[brewer.pal.info$category == "qual", ]
 Color <- unlist(mapply(brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals)))
 
-data <- read.table(file = "biotype_counts_processed.txt", sep = "\t", header = TRUE)
+data <- read.table(file = "./DE_analysis/counts_table/biotype_counts_processed.txt", sep = "\t", header = TRUE)
 
-# Rearrange data so that it matches the next step
+## Rearrange data so that it matches the next step
 data <- data[, c(1, 4, 5, 2, 3)]
 
 ## Rename columns
@@ -38,19 +37,19 @@ colnames(data) <- c(
 
 data <- subset(data, rowSums(data[, c(2:5)], ) > 0)
 
-# Transforming the data
+## Transforming the data
 data_for_plot <- tidyr::gather(data, "Condition", "Reads", 2:5)
 
-# One way of defining sample order
+## One way of defining sample order
 
 sample_order <- c(
   "WT_1", "WT_2",
   "KO_1", "KO_2"
 )
 
-# Plot
+## Plot
 
-pdf("RPF_biotypes.pdf", paper = "a4", useDingbats = FALSE)
+pdf("./DE_analysis/RPF_biotypes.pdf", paper = "a4", useDingbats = FALSE)
 ggplot(
   data_for_plot,
   aes(
