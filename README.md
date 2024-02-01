@@ -17,18 +17,21 @@ In order to use the functionalities provided by the R source code here, some pre
 1. Install [R 4.3.2](https://www.r-project.org/) for your corresponding OS.
 2. Install [RStudio](https://posit.co/download/rstudio-desktop/).
 3. Download the repository (either download and extract zip or git clone).
-4. Open project file [ribosome-profiling.Rproj](https://github.com/JeremyRotzetter/ribosome-profiling/blob/main/ribosome-profiling.Rproj). renv should automatically be installed and activated. If not `source(renv\activate.R)`.
-5. renv will now check the *renv.lock* file and ask if it should install all dependencies of the project. Select `Y`. renv will then download and install required R packages from their respective sources and in the correct version into the project library.
-6. Should the error message `Error in system(paste(MAKE, p1(paste("-f", shQuote(makefiles))), "compilers"),  : 
-  'make' not found` appear during the restoration of the project library, then this means that one of the corresponding package
-versions has been archived and the binary is no longer available. In this case, the package must be compiled and built from
+4. Open project file [ribosome-profiling.Rproj](https://github.com/JeremyRotzetter/ribosome-profiling/blob/main/ribosome-profiling.Rproj). renv should automatically be installed and activated. If not use:
+   ```
+   source(renv\activate.R)
+   ```
+6. renv will now check the *renv.lock* file and ask if it should install all dependencies of the project. Select `Y`. renv will then download and install required R packages from their respective sources and in the correct version into the project library.
+7. Should the error message `Error in system(paste(MAKE, p1(paste("-f", shQuote(makefiles))), "compilers"), : 'make' not found` appear during the restoration of the project library, then this means that one of the corresponding package versions has been archived and the binary is no longer available. In this case, the package must be compiled and built from
 source for the respective OS. The 'make' utility is commonly used in R packages to compile and build software from source code.
 Since the 'make' utility is not installed on your system, there are different ways to install it, depending on your OS:
 
     - For Windows: Windows users should install the appropriate iteration of [Rtools](https://cran.r-project.org/bin/windows/Rtools/) for their R version. Rtools is a toolchain bundle used for building R packages from source (those that need compilation of C/C++ or Fortran code) and for build R itself.
 
-    - For Linux: You can install 'make' using the package manager specific to your Linux distribution. For example, on Ubuntu or Debian-based systems, you can run the following command in the terminal: `apt-get install build-essential`
-
+    - For Linux: You can install 'make' using the package manager specific to your Linux distribution. For example, on Ubuntu or Debian-based systems, you can run the following command in the terminal:
+      ```
+      apt-get install build-essential
+      ```
     - For macOS: In order to compile R for macOS, you will need Xcode developer tools from Apple and GNU Fortran compiler. More information can be found on the [r-project website for mac](https://mac.r-project.org/tools/).
 
     - Alternatively it might be possible to also install binaries from [Posit Public Package Manager](https://packagemanager.posit.co/) snapshots, which often has binary packages available.
